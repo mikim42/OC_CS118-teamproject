@@ -37,3 +37,4 @@ _loadDisks:
 pushl %ebp
 movl %esp, %ebp
 movl 16(%ebp), %ecx
+thisLoop:
