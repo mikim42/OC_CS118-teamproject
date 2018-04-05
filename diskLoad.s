@@ -18,9 +18,22 @@ str1: .asciz "This is a test string"
 .text
 .globl _start
 _start:
+ 
+leal str1, %edi
+movl $str1Len, %ecx
 
+pushl %ecx
+pushl %edi
+calll _loadDisks
+addl $8, %esp
 
 
 movl $1, %eax
 movl $0, %ebx
 int $0x80
+
+
+_loadDisks:
+pushl %ebp
+movl %esp, %ebp
+movl 16(%ebp), %ecx
