@@ -36,7 +36,39 @@ int $0x80
 _loadDisks:
 pushl %ebp
 movl %esp, %ebp
-movl 16(%ebp), %ecx
-thisLoop:
-#Comment
-#New Comment
+movl 12(%ebp), %ecx
+movl $0, %ebx
+movl $0, %esi
+diskLoadLoop:
+movl 8(%ebp), %edi
+movb (%edi, %ebx, 1), %al
+leal disk1, %edx
+movb %al, (%edx, %esi, 1)
+
+incl %ebx
+cmpl %ebx, 12(%ebp)
+je returnLoadDisks
+
+movb (%edi, %ebx, 1), %al
+leal disk2, %edx
+movb %al,  (%edx, %esi, 1)
+
+incl %ebx
+cmpl %ebx, 12(%ebp)
+je returnLoadDisks
+
+movb (%edi, %ebx, 1), %al
+leal disk3, %edx
+movb %al, (%edx, %esi, 1)
+
+incl %ebx
+cmpl %ebx, 12(%ebp)
+je returnLoadDisks
+
+incl %esi
+
+loop diskLoadLoop
+
+returnLoadDisks:
+popl %ebp
+retl
