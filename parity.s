@@ -1,5 +1,5 @@
 /*
-Author: Victor Sanchez Gutierrez
+Author: Jesse Brown
 
 This file will load a string into three different arrays (Disks)
 
