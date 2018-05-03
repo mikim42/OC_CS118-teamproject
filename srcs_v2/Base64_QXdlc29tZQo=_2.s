@@ -17,65 +17,65 @@
 
 #                                   Jesse Brown : Mingyun Kim : Victor Sanchez #
 
-.extern	_printString
+.extern	_printString                # These are external C++ functions
 .extern	_printStringN
 .extern	_getString
 
 .data
-script00:	.string "Please enter data [max: 45 characters]:     | here!"
+script00:	.string "Please enter data [max: 45 characters]:     | here!"   # Script for user input
 .equ		len00, (. - script00)
-script01:	.string "Which disk do you want to corrupt [1, 2, 3]?"
+script01:	.string "Which disk do you want to corrupt [1, 2, 3]?"          # Script for user corruption    
 .equ		len01, (. - script01)
-script02:	.string "\nAfter recover:"
+script02:	.string "\nAfter recover:"                                      # Script after the corruption is made
 .equ		len02, (. - script02)
-script03:	.string "Disk 1: "
+script03:	.string "Disk 1: "          # Disk labels
 script04:	.string "Disk 2: "
 script05:	.string "Disk 3: "
-script06:	.string "Parity: "
-script07:	.string "Result: "
+script06:	.string "Parity: "          # Parity label
+script07:	.string "Result: "          # Final rebuilt string label
 
 .bss
 .lcomm	input 4
-.lcomm	disk1 15
-.lcomm	disk2 15
-.lcomm	disk3 15
-.lcomm	parity 15
-.lcomm	result 45
+.lcomm disk1 15                         # We set the size of the disks 
+.lcomm disk2 15                         # to be 15 bytes each, so the length
+.lcomm disk3 15                         # of the string can be max 45 bytes.
+.lcomm parity 15                        # The parity disk size
+.lcomm result 45                        # This is the string after it's rebuilt
 
 .text
 .globl _asmMain
 _asmMain:
-	push	%ebp
+	push	%ebp                        # Create ASM main
 	movl	%esp, %ebp
 
-	push	$script00
-	call	_printString
-	addl	$4, %esp
+	push	$script00                   # Push address of string
+	call	_printString                # Print string to console    
+	addl	$4, %esp                    # Clean stack
 
-	call	_getString
-	movl	%eax, input
+	call	_getString                  # Get user input
+	movl	%eax, input                 # Store into input variable
 
-	pushl	$45
-	pushl	input
-	call	_loadDisks
-	addl	$8, %esp
+	pushl	$45                         # 45 is the max string
+	pushl	input                       # Push the input string
+	call	_loadDisks                  # Load the disks    
+	addl	$8, %esp                    # Clean stack
 	
-	push	$disk3
-	push	$disk2
-	push	$disk1
-	push	$parity
-	call	_RAID
-	addl	$16, %esp
+	push	$disk3                      # Push the address of the disks
+	push	$disk2                      # That have the stiped string into
+	push	$disk1                      # the system stack
+	push	$parity                     # along with the parity disk
+	call	_RAID                       # Call the _RAID to build the Parity
+	addl	$16, %esp                   # Clean the stack
 
 	push	$script01
-	call	_printString
-	addl	$4, %esp
+	call	_printString                # Ask user which disk to corrupt
+	addl	$4, %esp                    # Clean stack
 
-	call	_getString
-	cmpb	$'2', (%eax)
-	jb		_corruptDisk1
-	je		_corruptDisk2
-	ja		_corruptDisk3
+	call	_getString                  # Get user input
+	cmpb	$'2', (%eax)                # Compare to see which disk they chose
+	jb		_corruptDisk1               # If less than 2, they chose 1
+	je		_corruptDisk2               # If equal they chose two
+	ja		_corruptDisk3               # If above they chose three
 
 _corruptDisk1:
 	push	$disk1
