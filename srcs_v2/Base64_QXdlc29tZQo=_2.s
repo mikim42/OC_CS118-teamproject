@@ -6,7 +6,7 @@
 #    By: mikim <mikim@student.42.us.org>            +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2018/05/01 10:36:25 by mikim             #+#    #+#              #
-#    Updated: 2018/05/03 08:42:04 by mikim            ###   ########.fr        #
+#    Updated: 2018/05/03 08:48:32 by mikim            ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -22,7 +22,7 @@
 .extern	_getString
 
 .data
-script00:	.string "Please enter data [max: 45 characters]:"
+script00:	.string "Please enter data [max: 45 characters]:     | here!"
 .equ		len00, (. - script00)
 script01:	.string "Which disk do you want to corrupt [1, 2, 3]?"
 .equ		len01, (. - script01)
