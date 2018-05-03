@@ -1,12 +1,12 @@
 # **************************************************************************** #
 #                                                                              #
 #                                                         :::      ::::::::    #
-#    a.s                                                :+:      :+:    :+:    #
+#    Base64_QXdlc29tZQo=_2.s                            :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
 #    By: mikim <mikim@student.42.us.org>            +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2018/05/01 10:36:25 by mikim             #+#    #+#              #
-#    Updated: 2018/05/01 12:13:31 by mikim            ###   ########.fr        #
+#    Updated: 2018/05/03 08:42:04 by mikim            ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -32,6 +32,7 @@ script03:	.string "Disk 1: "
 script04:	.string "Disk 2: "
 script05:	.string "Disk 3: "
 script06:	.string "Parity: "
+script07:	.string "Result: "
 
 .bss
 .lcomm	input 4
@@ -39,10 +40,13 @@ script06:	.string "Parity: "
 .lcomm	disk2 15
 .lcomm	disk3 15
 .lcomm	parity 15
+.lcomm	result 45
 
 .text
 .globl _asmMain
 _asmMain:
+	push	%ebp
+	movl	%esp, %ebp
 
 	push	$script00
 	call	_printString
@@ -217,9 +221,37 @@ _end:
 	call	_printString
 	addl	$4, %esp
 
-	movl $1, %eax
-	movl $0, %ebx
-	int $0x80
+	movl	$15, %ecx
+	xor		%eax, %eax
+	xor		%ebx, %ebx
+	xor		%edx, %edx
+	movl	$result, %esi
+
+	_getResult:
+		movl	$disk1, %edi
+		movb	(%edi, %eax, 1), %dl
+		movb	%dl, (%esi, %ebx, 1)
+		inc		%ebx
+		movl	$disk2, %edi
+		movb	(%edi, %eax, 1), %dl
+		movb	%dl, (%esi, %ebx, 1)
+		inc		%ebx
+		movl	$disk3, %edi
+		movb	(%edi, %eax, 1), %dl
+		movb	%dl, (%esi, %ebx, 1)
+		inc		%ebx
+		inc		%eax
+		loop	_getResult
+
+	push	$script07
+	call	_printStringN
+	addl	$4, %esp
+	push	$result
+	call	_printString
+	addl	$4, %esp
+
+	pop		%ebp
+	retl
 
 # Function loadDisks
 _loadDisks:
@@ -259,8 +291,8 @@ _loadDisks:
 	loop	_diskLoadLoop
 
 _returnLoadDisks:
-	popl	%ebp
-	retl
+	pop		%ebp
+	ret
 
 # Function RAID
 _RAID:

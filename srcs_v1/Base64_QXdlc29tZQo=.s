@@ -1,12 +1,12 @@
 # **************************************************************************** #
 #                                                                              #
 #                                                         :::      ::::::::    #
-#    combined.s                                         :+:      :+:    :+:    #
+#    Base64_QXdlc29tZQo=.s                              :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
 #    By: mikim <mikim@student.42.us.org>            +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2018/05/01 10:36:25 by mikim             #+#    #+#              #
-#    Updated: 2018/05/01 11:07:41 by mikim            ###   ########.fr        #
+#    Updated: 2018/05/03 08:31:45 by mikim            ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -26,6 +26,7 @@ str1: .string "This is a test string"
 .lcomm disk2 15
 .lcomm disk3 15
 .lcomm parity 15
+.lcomm result 45
 
 .text
 .globl _start
@@ -56,6 +57,27 @@ _start:
 	push	$disk1
 	call	_RAID  #tHIS IS A TEMPORARY RECOVER OPTION, IT'S JUST A COPY OF LOAD PARITY
 	addl	$16, %esp
+
+	movl	$15, %ecx
+	xor		%eax, %eax
+	xor		%ebx, %ebx
+	xor		%edx, %edx
+	movl	$result, %esi
+	_getResult:
+		movl	$disk1, %edi
+		movb	(%edi, %eax, 1), %dl
+		movb	%dl, (%esi, %ebx, 1)
+		inc		%ebx
+		movl	$disk2, %edi
+		movb	(%edi, %eax, 1), %dl
+		movb	%dl, (%esi, %ebx, 1)
+		inc		%ebx
+		movl	$disk3, %edi
+		movb	(%edi, %eax, 1), %dl
+		movb	%dl, (%esi, %ebx, 1)
+		inc		%ebx
+		inc		%eax
+		loop	_getResult
 
 _end:
 	movl $1, %eax
