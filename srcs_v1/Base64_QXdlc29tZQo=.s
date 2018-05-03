@@ -55,7 +55,7 @@ _start:
 	push	$disk2
 	push	$parity
 	push	$disk1
-	call	_RAID  #tHIS IS A TEMPORARY RECOVER OPTION, IT'S JUST A COPY OF LOAD PARITY
+	call	_RAID  
 	addl	$16, %esp
 
 	movl	$15, %ecx
@@ -128,23 +128,23 @@ _returnLoadDisks:
 # Function RAID
 _RAID:
 	pushl	%ebp							#This is the function prologue
-	movl	%esp, %ebp						#and the next line of it
-	movl	8(%ebp), %edi					#The address of the parity
-	movl	12(%ebp), %eax
-	movl	16(%ebp), %edx
-	movl	20(%ebp), %esi
-	movl	$15, %ecx
+	movl	%esp, %ebp						#and the next line of it.
+	movl	8(%ebp), %edi					#The address of the parity/corrupted disk.
+	movl	12(%ebp), %eax                  #The address of the other 3 disks which
+	movl	16(%ebp), %edx                  #are a combination of disk1, 2, 3, or the
+	movl	20(%ebp), %esi                  #parity. 
+	movl	$15, %ecx                       #Move 15 into ECX as a loop counter.
 	_RAIDLoop:
-		decl	%ecx
-		movb	(%eax, %ecx, 1), %bl
-		xor		(%edx, %ecx, 1), %ebx
-		xor		(%esi, %ecx, 1), %ebx
-		movb	%bl, (%edi, %ecx, 1)
-		incl	%ecx
-		loop	_RAIDLoop
+		decl	%ecx                        #Decrement ECX to use it as an index.
+		movb	(%eax, %ecx, 1), %bl        #Move an element into BL then XOR
+		xor		(%edx, %ecx, 1), %ebx       #it with an element of the other disks.
+		xor		(%esi, %ecx, 1), %ebx       #
+		movb	%bl, (%edi, %ecx, 1)        #Move the result into parity/recovered
+		incl	%ecx                        #disk. Increase ECX for loop count.
+		loop	_RAIDLoop                   #Check if done.
 
-	pop		%ebp						#Reset the stack
-	retl								#Return to start function
+	pop		%ebp						    #Reset the stack
+	retl								    #Return to start function
 
 # Function corruption
 _corruption:
