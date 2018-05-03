@@ -26,7 +26,7 @@ script00:	.string "Please enter data [max: 45 characters]:     | here!"   # Scri
 .equ		len00, (. - script00)
 script01:	.string "Which disk do you want to corrupt [1, 2, 3]?"          # Script for user corruption    
 .equ		len01, (. - script01)
-script02:	.string "\nAfter recover:"                                      # Script after the corruption is made
+script02:	.string "\nAfter recovery:"                                     # Script after the corruption is made
 .equ		len02, (. - script02)
 script03:	.string "Disk 1: "          # Disk labels
 script04:	.string "Disk 2: "
@@ -78,43 +78,55 @@ _asmMain:
 	ja		_corruptDisk3               # If above they chose three
 
 _corruptDisk1:
-	push	$disk1
-	call	_corruption
+	push	$disk1                      # Push the address of the disk
+	call	_corruption                 # Call the corruption function
+	addl	$4, %esp                    # Clean the stack
+
+	push	$script03                   # This block will display
+	call	_printStringN               # The state of the disks
+	addl	$4, %esp                    # after the corruption has
+	push	$disk1                      # been executed.
+	call	_printString
 	addl	$4, %esp
 
-	push	$script03
+	push	$script04
 	call	_printStringN
 	addl	$4, %esp
-	push	$disk1
-	call	_printString
-	addl	$4, %esp
 	push	$disk2
 	call	_printString
 	addl	$4, %esp
+
+	push	$script05
+	call	_printStringN
+	addl	$4, %esp
 	push	$disk3
 	call	_printString
+	addl	$4, %esp
+
+	push	$script06
+	call	_printStringN
 	addl	$4, %esp
 	push	$parity
 	call	_printString
 	addl	$4, %esp
 
-	push	$disk3
-	push	$disk2
-	push	$parity
-	push	$disk1
-	call	_RAID  #tHIS IS A TEMPORARY RECOVER OPTION, IT'S JUST A COPY OF LOAD PARITY
-	addl	$16, %esp
-	jmp		_end
+	push	$disk3                      # After the state of the disks has
+	push	$disk2                      # been displayed, we need to rebuild
+	push	$parity                     # the corrupted disk, so we call the 
+	push	$disk1                      # RAID function with the corrupted disk
+	call	_RAID                       # Pushed last
+	addl	$16, %esp                   # Clear stack
+	jmp		_end                        # Jump to end of program
 
 _corruptDisk2:
-	push	$disk2
-	call	_corruption
-	addl	$4, %esp
+	push	$disk2                      # Push the address of the disk
+	call	_corruption                 # Call the corruption function
+	addl	$4, %esp                    # Clean the stack
 
-	push	$script03
-	call	_printStringN
-	addl	$4, %esp
-	push	$disk1
+	push	$script03                   # This block will display
+	call	_printStringN               # The state of the disks
+	addl	$4, %esp                    # after the corruption has
+	push	$disk1                      # been executed.
 	call	_printString
 	addl	$4, %esp
 
@@ -139,23 +151,23 @@ _corruptDisk2:
 	call	_printString
 	addl	$4, %esp
 
-	push	$disk3
-	push	$disk1
-	push	$parity
-	push	$disk2
-	call	_RAID  #tHIS IS A TEMPORARY RECOVER OPTION, IT'S JUST A COPY OF LOAD PARITY
-	addl	$16, %esp
-	jmp		_end
+	push	$disk3                      # After the state of the disks has
+	push	$disk1                      # been displayed, we need to rebuild
+	push	$parity                     # the corrupted disk, so we call the 
+	push	$disk2                      # RAID function with the corrupted disk
+	call	_RAID                       # Pushed last
+	addl	$16, %esp                   # Clear stack
+	jmp		_end                        # Jump to end of program
 
 _corruptDisk3:
-	push	$disk3
-	call	_corruption
-	addl	$4, %esp
+	push	$disk3                      # Push the address of the disk
+	call	_corruption                 # Call the corruption function
+	addl	$4, %esp                    # Clean the stack
 
-	push	$script03
-	call	_printStringN
-	addl	$4, %esp
-	push	$disk1
+	push	$script03                   # This block will display
+	call	_printStringN               # The state of the disks
+	addl	$4, %esp                    # after the corruption has
+	push	$disk1                      # been executed.
 	call	_printString
 	addl	$4, %esp
 
@@ -180,58 +192,57 @@ _corruptDisk3:
 	call	_printString
 	addl	$4, %esp
 
-	push	$disk2
-	push	$disk1
-	push	$parity
-	push	$disk3
-	call	_RAID  #tHIS IS A TEMPORARY RECOVER OPTION, IT'S JUST A COPY OF LOAD PARITY
-	addl	$16, %esp
-	jmp		_end
+	push	$disk2                      # After the state of the disks has
+	push	$disk1                      # been displayed, we need to rebuild
+	push	$parity                     # the corrupted disk, so we call the 
+	push	$disk3                      # RAID function with the corrupted disk
+	call	_RAID                       # Pushed last
+	addl	$16, %esp                   # Clear stack
+	jmp		_end                        # Jump to end of program
 
 _end:
-	push	$script02
+	push	$script02                   # This will print the "After recovery"
 	call	_printString
 	addl	$4, %esp
 
-	push	$script03
-	call	_printStringN
+	push	$script03                   # Disk 1 label
+	call	_printStringN               # Print without newline
 	addl	$4, %esp
-	push	$disk1
+	push	$disk1                      # Print disk1 contents
 	call	_printString
 	addl	$4, %esp
 
-	push	$script04
-	call	_printStringN
+	push	$script04                   # Disk 2 label
+	call	_printStringN               # Print without newline
 	addl	$4, %esp
-	push	$disk2
+	push	$disk2                      # Print disk 2 contents
 	call	_printString
 	addl	$4, %esp
 
-	push	$script05
-	call	_printStringN
+	push	$script05                   # Disk 3 label
+	call	_printStringN               # Print without newline
 	addl	$4, %esp
 	push	$disk3
+	call	_printString                # Print disk 3 contents
+	addl	$4, %esp
+
+	push	$script06                   # Parity label
+	call	_printStringN               # Print without newline
+	addl	$4, %esp
+	push	$parity                     # Print parity contents
 	call	_printString
 	addl	$4, %esp
 
-	push	$script06
-	call	_printStringN
-	addl	$4, %esp
-	push	$parity
-	call	_printString
-	addl	$4, %esp
-
-	movl	$15, %ecx
-	xor		%eax, %eax
+	movl	$15, %ecx                   # We move 15 into ecx because that's the 
+	xor		%eax, %eax                  # size of the disks
 	xor		%ebx, %ebx
 	xor		%edx, %edx
-	movl	$result, %esi
-
-	_getResult:
-		movl	$disk1, %edi
-		movb	(%edi, %eax, 1), %dl
-		movb	%dl, (%esi, %ebx, 1)
-		inc		%ebx
+	movl	$result, %esi               # Result is the address of the string
+	_getResult:                         # This section essentially does the reverse
+		movl	$disk1, %edi            # of the loadDisk function, it goes through
+		movb	(%edi, %eax, 1), %dl    # the disks and grabs a letter from     
+		movb	%dl, (%esi, %ebx, 1)    # an index and moves that letter into
+		inc		%ebx                    # the appropriate index in the result string
 		movl	$disk2, %edi
 		movb	(%edi, %eax, 1), %dl
 		movb	%dl, (%esi, %ebx, 1)
@@ -241,58 +252,58 @@ _end:
 		movb	%dl, (%esi, %ebx, 1)
 		inc		%ebx
 		inc		%eax
-		loop	_getResult
+		loop	_getResult              # Loop until we reach the end of the disks
 
 	push	$script07
 	call	_printStringN
 	addl	$4, %esp
-	push	$result
-	call	_printString
+	push	$result                     # Print result string, which should be identical
+	call	_printString                # To the input string
 	addl	$4, %esp
 
-	pop		%ebp
-	retl
+	pop		%ebp                        # Pop ASM Main
+	retl                                # Return to C++ Main
 
 # Function loadDisks
 _loadDisks:
-	pushl	%ebp
-	movl	%esp, %ebp
-	movl	12(%ebp), %ecx
-	movl	$0, %ebx
+	pushl	%ebp                        # Build the stack frame
+	movl	%esp, %ebp                  # Move the stack pointer
+	movl	12(%ebp), %ecx              # Grab the length of string and store
+	movl	$0, %ebx                    # Load 0 into ebx and esi
 	movl	$0, %esi
 	_diskLoadLoop:
-		movl	8(%ebp), %edi
-		movb	(%edi, %ebx, 1), %al
-		leal	disk1, %edx
-		movb	%al, (%edx, %esi, 1)
+		movl	8(%ebp), %edi           # Move the address of string into edi
+		movb	(%edi, %ebx, 1), %al    # Grab a letter from the string into al
+		leal	disk1, %edx             # Load the address of disk1
+		movb	%al, (%edx, %esi, 1)    # Move that letter into the spot in disk1    
+
+	incl	%ebx                        # Increment the index
+	cmpl	%ebx, 12(%ebp)              # Check if the index is the length of the string
+	je		_returnLoadDisks            # If so, we have reached the end of the string
+
+	movb	(%edi, %ebx, 1), %al        # Otherwise grab another letter from the string
+	leal	disk2, %edx                 # Load address of disk 2
+	movb	%al,  (%edx, %esi, 1)       # Move that letter into the index in disk 2
 
 	incl	%ebx
-	cmpl	%ebx, 12(%ebp)
+	cmpl	%ebx, 12(%ebp)              # Increment index and Perform check again
 	je		_returnLoadDisks
 
-	movb	(%edi, %ebx, 1), %al
-	leal	disk2, %edx
-	movb	%al,  (%edx, %esi, 1)
+	movb	(%edi, %ebx, 1), %al        # Grab a letter from the string
+	leal	disk3, %edx                 # Load address of Disk3
+	movb	%al, (%edx, %esi, 1)        # Move that letter into the index in disk 3
 
-	incl	%ebx
-	cmpl	%ebx, 12(%ebp)
+	incl	%ebx                                
+	cmpl	%ebx, 12(%ebp)              # Increment index and perform check again
 	je		_returnLoadDisks
 
-	movb	(%edi, %ebx, 1), %al
-	leal	disk3, %edx
-	movb	%al, (%edx, %esi, 1)
+	incl	%esi                        # Increment index of the disks
 
-	incl	%ebx
-	cmpl	%ebx, 12(%ebp)
-	je		_returnLoadDisks
-
-	incl	%esi
-
-	loop	_diskLoadLoop
+	loop	_diskLoadLoop               # Loop
 
 _returnLoadDisks:
-	pop		%ebp
-	ret
+	popl	%ebp                        # End of function
+	retl
 
 # Function RAID
 _RAID:
@@ -319,17 +330,17 @@ _RAID:
 
 # Function corruption
 _corruption:
-	pushl	%ebp
+	pushl	%ebp                            # Create function stack
 	movl	%esp, %ebp
 
-	mov		8(%ebp), %esi
-	mov		$15, %ecx
-	xor		%eax, %eax
+	mov		8(%ebp), %esi                   # Get address of string
+	mov		$15, %ecx                       # Move 15 because that's the size of string
+	xor		%eax, %eax                      # Clear eax
 
 	_corruptLoop:
-		xor		$'A', (%esi, %eax, 1)
-		inc		%eax
-		loop	_corruptLoop
+		xor		$'A', (%esi, %eax, 1)       # Random change of value of character in index
+		inc		%eax                        # Increase index
+		loop	_corruptLoop                # loop
 
-	popl	%ebp
+	popl	%ebp                            # End of function
 	retl
