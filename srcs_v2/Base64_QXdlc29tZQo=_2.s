@@ -6,7 +6,7 @@
 #    By: mikim <mikim@student.42.us.org>            +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2018/05/01 10:36:25 by mikim             #+#    #+#              #
-#    Updated: 2018/05/03 08:48:32 by mikim            ###   ########.fr        #
+#    Updated: 2018/05/08 08:31:50 by mikim            ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -269,44 +269,43 @@ _loadDisks:
 	pushl	%ebp                        # Build the stack frame
 	movl	%esp, %ebp                  # Move the stack pointer
 	movl	12(%ebp), %ecx              # Grab the length of string and store
+	movl	8(%ebp), %edi				# Move the input string to EDI
 	movl	$0, %ebx                    # Load 0 into ebx and esi
 	movl	$0, %esi
 	_diskLoadLoop:
-		movl	8(%ebp), %edi           # Move the address of string into edi
 		movb	(%edi, %ebx, 1), %al    # Grab a letter from the string into al
 		leal	disk1, %edx             # Load the address of disk1
 		movb	%al, (%edx, %esi, 1)    # Move that letter into the spot in disk1    
 
-	incl	%ebx                        # Increment the index
-	cmpl	%ebx, 12(%ebp)              # Check if the index is the length of the string
-	je		_returnLoadDisks            # If so, we have reached the end of the string
+		incl	%ebx                        # Increment the index
+		cmpl	%ebx, 12(%ebp)              # Check if the index is the length of the string
+		je		_returnLoadDisks            # If so, we have reached the end of the string
 
-	movb	(%edi, %ebx, 1), %al        # Otherwise grab another letter from the string
-	leal	disk2, %edx                 # Load address of disk 2
-	movb	%al,  (%edx, %esi, 1)       # Move that letter into the index in disk 2
+		movb	(%edi, %ebx, 1), %al        # Otherwise grab another letter from the string
+		leal	disk2, %edx                 # Load address of disk 2
+		movb	%al,  (%edx, %esi, 1)       # Move that letter into the index in disk 2
 
-	incl	%ebx
-	cmpl	%ebx, 12(%ebp)              # Increment index and Perform check again
-	je		_returnLoadDisks
+		incl	%ebx
+		cmpl	%ebx, 12(%ebp)              # Increment index and Perform check again
+		je		_returnLoadDisks
 
-	movb	(%edi, %ebx, 1), %al        # Grab a letter from the string
-	leal	disk3, %edx                 # Load address of Disk3
-	movb	%al, (%edx, %esi, 1)        # Move that letter into the index in disk 3
+		movb	(%edi, %ebx, 1), %al        # Grab a letter from the string
+		leal	disk3, %edx                 # Load address of Disk3
+		movb	%al, (%edx, %esi, 1)        # Move that letter into the index in disk 3
 
-	incl	%ebx                                
-	cmpl	%ebx, 12(%ebp)              # Increment index and perform check again
-	je		_returnLoadDisks
+		incl	%ebx                                
+		cmpl	%ebx, 12(%ebp)              # Increment index and perform check again
+		je		_returnLoadDisks
 
-	incl	%esi                        # Increment index of the disks
+		incl	%esi                        # Increment index of the disks
 
-	loop	_diskLoadLoop               # Loop
+		loop	_diskLoadLoop               # Loop
 
 _returnLoadDisks:
 	popl	%ebp                        # End of function
 	retl
 
 # Function RAID
-_RAID:
 _RAID:
 	pushl	%ebp							#This is the function prologue
 	movl	%esp, %ebp						#and the next line of it.
